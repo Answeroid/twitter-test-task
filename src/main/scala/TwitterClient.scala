@@ -1,28 +1,18 @@
-import twitter4j.TwitterFactory
-import twitter4j.Twitter
-import twitter4j.conf.ConfigurationBuilder
+import com.danielasfregola.twitter4s.TwitterRestClient
+import com.danielasfregola.twitter4s.entities.{AccessToken, ConsumerToken}
 
 
 object TwitterClient {
 
     def main(args : Array[String]) {
 
-        // (1) config work to create a twitter object
-        val cb = new ConfigurationBuilder
-        cb.setDebugEnabled(true)
-            .setOAuthConsumerKey("YOUR KEY HERE")
-            .setOAuthConsumerSecret("YOUR SECRET HERE")
-            .setOAuthAccessToken("YOUR ACCESS TOKEN")
-            .setOAuthAccessTokenSecret("YOUR ACCESS TOKEN SECRET")
-        val tf = new TwitterFactory(cb.build)
-        val twitter = tf.getInstance
+        val consumerToken = ConsumerToken(key = "cons-access-token", secret = "cons-access-key")
+        val accessToken = AccessToken(key = "my-access-key", secret = "my-access-secret")
+        val client = new TwitterRestClient(consumerToken, accessToken)
 
-        val statuses = twitter.getFriendsTimeline
-        println("Showing friends timeline.")
-        val it = statuses.iterator
-        while (it.hasNext()) {
-            val status = it.next
-            println(status.getUser.getName + ":" + status.getText);
-        }
+        client.createTweet("test status of newly created tweet")
+        client.deleteTweet(12312311123121L)
+
+        // to be continued
     }
 }
