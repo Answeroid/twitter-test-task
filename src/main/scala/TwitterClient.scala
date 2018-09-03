@@ -1,18 +1,34 @@
-import com.danielasfregola.twitter4s.TwitterRestClient
-import com.danielasfregola.twitter4s.entities.{AccessToken, ConsumerToken}
+import twitter4j.{Status, Twitter, TwitterFactory}
+import twitter4j.conf.ConfigurationBuilder
+
+import scala.util.Properties
 
 
-object TwitterClient {
+object TwitterClient extends App {
 
-    def main(args : Array[String]) {
+    def twitterClient: Twitter = initiateClient
 
-        val consumerToken = ConsumerToken(key = "cons-access-token", secret = "cons-access-key")
-        val accessToken = AccessToken(key = "my-access-key", secret = "my-access-secret")
-        val client = new TwitterRestClient(consumerToken, accessToken)
+    private def initiateClient: Twitter = {
+        val cb = new ConfigurationBuilder
+        cb.setDebugEnabled(true)
+            .setOAuthConsumerKey(Properties.envOrElse("TWITTER_CONSUMER_TOKEN_KEY", ""))
+            .setOAuthConsumerSecret(Properties.envOrElse("TWITTER_CONSUMER_TOKEN_SECRET", ""))
+            .setOAuthAccessToken(Properties.envOrElse("TWITTER_ACCESS_TOKEN_KEY", ""))
+            .setOAuthAccessTokenSecret(Properties.envOrElse("TWITTER_ACCESS_TOKEN_SECRET", ""))
+        val tf = new TwitterFactory(cb.build)
+        val twitter: Twitter = tf.getInstance
+        twitter
+    }
 
-        client.createTweet("test status of newly created tweet")
-        client.deleteTweet(12312311123121L)
+    def getClient: Twitter = {
+        twitterClient
+    }
 
-        // to be continued
+    def postTweet(tweet: String): Status = {
+        twitterClient.updateStatus(tweet)
+    }
+
+    def deleteTweet(id: Long): Unit = {
+        twitterClient.destroyStatus(id)
     }
 }
